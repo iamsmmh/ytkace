@@ -40,7 +40,33 @@ https://itzzace.github.io/ytkace/
 Rootless and roothide packages are both published. The repository page also has an
 [Add to Sileo](https://itzzace.github.io/ytkace/) button.
 
-**Sideloaded.** Download the IPA for your iOS version from the [latest release](https://github.com/itzzace/ytkace/releases/latest) and install it with TrollStore, AltStore, SideStore or LiveContainer.
+
+**Sideloading.** Add the repository in AltStore, SideStore or LiveContainer:
+
+YTKACE supports seamless installation and updates via **AltStore**, **SideStore**, and **LiveContainer**.
+
+### Add Source to AltStore / SideStore
+
+Click a badge below on your iOS device to add the official source directly:
+
+[![Add to AltStore](https://img.shields.io/badge/Add%20to-AltStore-007AFF?style=for-the-badge&logo=apple)](altstore://source?url=https://itzzace.github.io/ytkace/apps.json)
+[![Add to SideStore](https://img.shields.io/badge/Add%20to-SideStore-5856D6?style=for-the-badge&logo=apple)](sidestore://source?url=https://itzzace.github.io/ytkace/apps.json)
+
+* **Source URL:** `https://itzzace.github.io/ytkace/apps.json`
+
+---
+
+### LiveContainer Setup
+
+YTKACE can be run inside **LiveContainer** without using an extra App ID slot:
+
+1. **Via Source (Recommended):**
+   * Copy `https://itzzace.github.io/ytkace/apps.json`
+   * Open **LiveContainer** -> **Settings** -> **Sources** -> **Add Source** -> Paste the URL.
+2. **Via Manual IPA Import:**
+   * Download the latest `YTKACE.ipa` from [Releases](https://github.com/itzzace/ytkace/releases).
+   * Open **LiveContainer**, tap **+** (Add App), and select the downloaded `.ipa` file.
+
 
 ## Build
 
