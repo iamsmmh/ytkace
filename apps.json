@@ -12,12 +12,20 @@
       "developerName": "itzzace",
       "subtitle": "YouTube Enhancer & Downloader",
       "version": "0.1.0",
-      "versionDate": "2026-08-30T00:00:00Z",
-      "versionDescription": "Initial release setup.",
-      "downloadURL": "https://github.com/itzzace/ytkace/releases/download/v0.1.0/YTKACE.ipa",
+      "versionDate": "2026-08-30T04:03:41.631934+00:00",
+      "versionDescription": "New release update.",
+      "downloadURL": "https://github.com/iamsmmh/ytkace/releases/download//YTKACE.ipa",
       "iconURL": "https://raw.githubusercontent.com/itzzace/ytkace/main/assets/icon.png",
       "tintColor": "FF0000",
-      "versions": []
+      "versions": [
+        {
+          "version": "0.1.0",
+          "date": "2026-08-30T04:03:41.631934+00:00",
+          "localizedDescription": "New release update.",
+          "downloadURL": "https://github.com/iamsmmh/ytkace/releases/download//YTKACE.ipa",
+          "size": 120000000
+        }
+      ]
     }
   ]
 }
