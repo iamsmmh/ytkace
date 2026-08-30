@@ -1,0 +1,108 @@
+name: Update AltStore & SideStore Source
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch: # Allows manual run/test via GitHub Actions UI
+
+permissions:
+  contents: write
+
+jobs:
+  update-source:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Process Release & Sync apps.json
+        env:
+          TAG_NAME: ${{ github.event.release.tag_name }}
+          RELEASE_BODY: ${{ github.event.release.body }}
+          PUBLISHED_AT: ${{ github.event.release.published_at }}
+          REPO_FULL_NAME: ${{ github.repository }}
+          ASSETS_JSON: ${{ toJson(github.event.release.assets) }}
+        run: |
+          python3 -c "
+          import json, os, datetime
+
+          tag_name = os.environ.get('TAG_NAME', '')
+          tag = tag_name.lstrip('v') if tag_name else '0.1.0'
+          body = os.environ.get('RELEASE_BODY') or 'New release update.'
+          repo = os.environ.get('REPO_FULL_NAME', 'itzzace/ytkace')
+          pub_date = os.environ.get('PUBLISHED_AT') or (datetime.datetime.now(datetime.timezone.utc).isoformat())
+
+          # Default download URL fallback
+          ipa_url = f'https://github.com/{repo}/releases/download/{tag_name}/YTKACE.ipa'
+          asset_size = 120000000
+
+          # Locate true .ipa download URL and file size from GitHub release payload
+          try:
+              assets = json.loads(os.environ.get('ASSETS_JSON', '[]'))
+              for asset in assets:
+                  if asset.get('name', '').lower().endswith('.ipa'):
+                      ipa_url = asset.get('browser_download_url', ipa_url)
+                      asset_size = asset.get('size', asset_size)
+                      break
+          except Exception as e:
+              print(f'Warning parsing release assets: {e}')
+
+          # Load or create base apps.json
+          apps_file = 'apps.json'
+          if os.path.exists(apps_file):
+              with open(apps_file, 'r', encoding='utf-8') as f:
+                  try:
+                      data = json.load(f)
+                  except Exception:
+                      data = {}
+          else:
+              data = {}
+
+          data['name'] = data.get('name', 'YTKACE Official Source')
+          data['identifier'] = data.get('identifier', 'com.itzzace.ytkace')
+          data['subtitle'] = data.get('subtitle', 'YouTube Enhancer for iOS')
+          data['description'] = data.get('description', 'Official AltStore, SideStore, and LiveContainer source for YTKACE.')
+          data['iconURL'] = data.get('iconURL', f'https://raw.githubusercontent.com/{repo}/main/assets/icon.png')
+          data['website'] = data.get('website', f'https://github.com/{repo}')
+
+          if 'apps' not in data or not data['apps']:
+              data['apps'] = [{
+                  'name': 'YTKACE',
+                  'bundleIdentifier': 'com.google.ios.youtube',
+                  'developerName': 'itzzace',
+                  'subtitle': 'YouTube Enhancer & Downloader',
+                  'iconURL': f'https://raw.githubusercontent.com/{repo}/main/assets/icon.png',
+                  'tintColor': 'FF0000',
+                  'versions': []
+              }]
+
+          app = data['apps'][0]
+          app['version'] = tag
+          app['versionDate'] = pub_date
+          app['downloadURL'] = ipa_url
+          app['versionDescription'] = body
+
+          new_version_entry = {
+              'version': tag,
+              'date': pub_date,
+              'localizedDescription': body,
+              'downloadURL': ipa_url,
+              'size': asset_size
+          }
+
+          # Insert/Update version entry without duplication
+          existing_versions = [v for v in app.get('versions', []) if v.get('version') != tag]
+          existing_versions.insert(0, new_version_entry)
+          app['versions'] = existing_versions
+
+          with open(apps_file, 'w', encoding='utf-8') as f:
+              json.dump(data, f, indent=2, ensure_ascii=False)
+          print('Successfully updated apps.json')
+          "
+
+      - name: Commit and Push Updated Source
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add apps.json
+          git diff --staged --quiet || (git commit -m "chore: update apps.json for release ${TAG_NAME}" && git push)
